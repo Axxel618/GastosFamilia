@@ -37,7 +37,6 @@ with tab_mov:
         st.warning("⚠️ Faltan familiares o temáticas. Añádelos en las siguientes pestañas.")
     
     with st.form("formulario_movimiento"):
-        # Selector para elegir si es Gasto o Ingreso
         tipo_movimiento = st.radio("Tipo de movimiento:", ["Gasto 💸", "Ingreso 💰"], horizontal=True)
         
         col1, col2 = st.columns(2)
@@ -47,19 +46,23 @@ with tab_mov:
             tematica = st.selectbox("Temática", options=lista_tematicas if lista_tematicas else ["Esperando..."])
             
         dinero = st.number_input("Cantidad (€)", min_value=0.01, step=0.5, format="%.2f")
+        # NUEVO CAMPO AÑADIDO
+        comentario = st.text_input("Comentario (Opcional)", placeholder="Ej: Regalo de cumple, supermercado extra...")
+        
         enviado = st.form_submit_button("💾 Guardar Movimiento")
 
     if enviado:
         if not lista_familiares or not lista_tematicas:
             st.error("❌ Registra primero al menos un familiar y una temática.")
         else:
-            # TRUCO: Los ingresos se envían como negativo al backend
             dinero_final = dinero if "Gasto" in tipo_movimiento else -dinero
             
             datos_mov = {
                 "persona": persona,
                 "tema_tematica": tematica,
-                "dinero_gastado": dinero_final
+                "dinero_gastado": dinero_final,
+                # SE ENVÍA EL COMENTARIO O NULL
+                "comentario": comentario if comentario.strip() != "" else None 
             }
             try:
                 respuesta = requests.post(f"{API_URL}/gasto/", json=datos_mov)
@@ -167,7 +170,7 @@ with tab_stats:
             
             # 3. Historial detallado de la base de datos
             st.subheader("📝 Historial detallado")
-            df_mostrar = df[['fecha', 'persona', 'tema_tematica', 'tipo', 'cantidad_real']].sort_values(by="fecha", ascending=False)
+            df_mostrar = df[['fecha', 'persona', 'tema_tematica', 'tipo', 'cantidad_real', 'comentario']].sort_values(by="fecha", ascending=False)
             st.dataframe(df_mostrar, use_container_width=True)
             
     except Exception as e:

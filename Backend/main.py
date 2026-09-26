@@ -28,12 +28,12 @@ def obtener_familiares(db: Session = Depends(get_db)):
 @app.get("/gastos/")
 def obtener_gastos(db: Session = Depends(get_db)):
     gastos_db = db.query(models.Gasto).all()
-    # Convertimos los objetos de la base de datos a diccionarios
     return [
         {
             "persona": g.persona, 
             "tema_tematica": g.tema_tematica, 
             "dinero_gastado": g.dinero_gastado, 
+            "comentario": g.comentario, 
             "fecha": g.fecha
         } 
         for g in gastos_db
@@ -72,7 +72,8 @@ def registrar_gasto(gasto: GastoCreate, db: Session = Depends(get_db)):
     nuevo_gasto = models.Gasto(
         persona=gasto.persona,
         tema_tematica=gasto.tema_tematica,
-        dinero_gastado=gasto.dinero_gastado
+        dinero_gastado=gasto.dinero_gastado,
+        comentario=gasto.comentario
     )
     db.add(nuevo_gasto)
     db.commit()

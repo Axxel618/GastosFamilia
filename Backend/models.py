@@ -21,4 +21,5 @@ class Gasto(Base):
     persona = Column(String(50))
     tema_tematica = Column(String(100))
     dinero_gastado = Column(Float)
+    comentario = Column(String(255), nullable=True)
     fecha = Column(DateTime, default=datetime.datetime.now)
